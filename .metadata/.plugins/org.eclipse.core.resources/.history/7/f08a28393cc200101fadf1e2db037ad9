@@ -43,7 +43,7 @@
 DMA_HandleTypeDef hdma_memtomem_dma2_stream0;
 /* USER CODE BEGIN PV */
 uint32_t led_data[] = {GPIO_PIN_12, GPIO_PIN_12 << 16, GPIO_PIN_13, GPIO_PIN_13 << 16, GPIO_PIN_14, GPIO_PIN_14 << 16, GPIO_PIN_15, GPIO_PIN_15 << 16 };
-int Len = sizeof(led_data)/ sizeof(uint32_t);
+int len = sizeof(led_data)/ sizeof(uint32_t);
 uint32_t current_ticks = 0;
 /* USER CODE END PV */
 
@@ -99,7 +99,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	for(int i=0; i < Len; i++ ){
+	for(int i=0; i<  len; i++ ){
 
 		HAL_DMA_Start(&hdma_memtomem_dma2_stream0, (uint32_t) &led_data[i], (uint32_t)&GPIOD->ODR, 1);
 		HAL_DMA_PollForTransfer(&hdma_memtomem_dma2_stream0,HAL_DMA_FULL_TRANSFER, HAL_MAX_DELAY);
