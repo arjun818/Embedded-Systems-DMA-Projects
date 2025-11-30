@@ -1,0 +1,10 @@
+13:45:09 **** Incremental Build of configuration Debug for project ADC1_SRAM1_TEMP ****
+make -j4 all 
+arm-none-eabi-size  ADC1_SRAM1_TEMP.elf 
+   text	   data	    bss	    dec	    hex	filename
+  10496	     12	   1772	  12280	   2ff8	ADC1_SRAM1_TEMP.elf
+Finished building: default.size.stdout
+ 
+
+13:45:09 Build Finished. 0 errors, 0 warnings. (took 681ms)
+
