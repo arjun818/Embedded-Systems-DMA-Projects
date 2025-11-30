@@ -37,7 +37,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 #define OFFSET		0x800
-#define DST_ADDRESS (SRAM1_BASE + OFFSET)
+#define DESTINATION_ADDRESS (SRAM1_BASE + OFFSET)
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -102,7 +102,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	HAL_UART_Receive_DMA(&huart2, (uint8_t*)DST_ADDRESS, 40);
+	HAL_UART_Receive_DMA(&huart2, (uint8_t*)DESTINATION_ADDRESS, 40);
 
     /* USER CODE BEGIN 3 */
   }
