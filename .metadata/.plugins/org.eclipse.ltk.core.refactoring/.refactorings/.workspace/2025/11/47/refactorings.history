@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Delete resource &apos;Uart_Dma_Pc&apos;" deleteContents="false" description="Delete resource &apos;Uart_Dma_Pc&apos;" element1="/Uart_Dma_Pc" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1763294959103"/>
-</session>

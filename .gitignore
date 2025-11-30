@@ -1,0 +1,20 @@
+# Ignore Eclipse/STM32CubeIDE workspace settings
+.metadata/
+
+# Build folders
+Debug/
+Release/
+
+# Object and intermediate files
+*.o
+*.su
+*.cyclo
+*.d
+
+# Build outputs
+*.elf
+*.map
+*.list
+
+# Backup or temp files
+*~
