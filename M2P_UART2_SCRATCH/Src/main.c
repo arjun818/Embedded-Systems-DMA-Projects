@@ -23,10 +23,20 @@ void button_init(void);
 void uart2_init(void);
 void dma1_init(void);
 void send_some_data(void);
+void enable_dma1_stream(void);
+void dma1_interrupt_configuration(void);
+
+//Callbacks
+void HT_Complete_Callback();
+void FT_Complete_Callback();
+void TE_Error_Callback();
+void FE_Error_Callback();
+void DME_Error_Callback();
+
 
 #define BASE_ADDR_OF_GPIOA_PERI GPIOA
 
-char dataStream[] = "Hi Amma Kutty\r\n";
+char dataStream[] = "Hi amma, achan and Udit all slept?\r\n";
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
@@ -38,6 +48,8 @@ int main(void)
 	uart2_init();
 //	send_some_data();
 	dma1_init();
+	dma1_interrupt_configuration();
+	enable_dma1_stream();
     /* Loop forever */
 	for(;;);
 }
@@ -153,9 +165,6 @@ void dma1_init(void){
 	RCC_TypeDef *pRCC;
 	pRCC = RCC;
 
-	DMA_TypeDef *pDMA;
-	pDMA = DMA1;
-
 	DMA_Stream_TypeDef *pStream6;
 	pStream6 = DMA1_Stream6;
 
@@ -206,6 +215,64 @@ void dma1_init(void){
 	//13. Configure the stream priority.
 
 	//14. Enable the stream.
+//	pStream6->CR |= (1 << 0);
+}
+
+void enable_dma1_stream(void){
+	DMA_Stream_TypeDef *pStream6;
+	pStream6 = DMA1_Stream6;
+
+	//Enable the stream
 	pStream6->CR |= (1 << 0);
 }
 
+void dma1_interrupt_configuration(void){
+	DMA_Stream_TypeDef *pStream6;
+	pStream6 = DMA1_Stream6;
+
+	//1. Do for Half-transfer IE (HTIE)
+	pStream6->CR |= (1 << 3);
+
+	//2. Transfer complete IE (TCIE)
+	pStream6->CR |= (1 << 4);
+
+	//3. Transfer error IE (TEIE)
+	pStream6->CR |= (1 << 2);
+
+	//4. FIFO overrun/underrun IE (FEIE)
+	pStream6->FCR |= (1 << 7);
+
+	//5. Direct mode error (DMIE)
+	pStream6->CR |= (1 << 1);
+
+	//6. Enable the  IRQ for DMA1 stream6 global interrupt in NVIC
+	NVIC_EnableIRQ(DMA1_Stream6_IRQn);
+}
+void HT_Complete_Callback(){
+
+}
+void FT_Complete_Callback(){
+
+	DMA_Stream_TypeDef *pStream6;
+	pStream6 = DMA1_Stream6;
+
+	USART_TypeDef *pUART2;
+	pUART2 = USART2;
+
+	uint32_t len = sizeof(dataStream);
+	pStream6->NDTR = len;
+
+	pUART2->CR3 &= ~(1 << 7);
+
+	enable_dma1_stream();
+
+}
+void TE_Error_Callback(){
+	while(1);
+}
+void FE_Error_Callback(){
+	while(1);
+}
+void DME_Error_Callback(){
+	while(1);
+}
