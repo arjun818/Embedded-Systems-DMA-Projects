@@ -22,7 +22,7 @@
 void button_init(void);
 void uart2_init(void);
 void dma1_init(void);
-
+void send_some_data(void);
 
 #define BASE_ADDR_OF_GPIOA_PERI GPIOA
 
@@ -34,6 +34,7 @@ int main(void)
 {
 	button_init();
 	uart2_init();
+	send_some_data();
 	dma1_init();
     /* Loop forever */
 	for(;;);
@@ -77,6 +78,72 @@ void button_init(void){
 	NVIC_EnableIRQ(EXTI0_IRQn);
 }
 void uart2_init(void){
+	RCC_TypeDef *pRCC;
+	pRCC= RCC;
+
+	GPIO_TypeDef *pGPIOA;
+	pGPIOA = BASE_ADDR_OF_GPIOA_PERI;
+
+	USART_TypeDef *pUART2;
+	pUART2 = USART2;
+
+	//1. Enable the peripheral clk for UART2 peripheral.
+	pRCC->APB1ENR |= (1<<17);
+
+	//2. Configure the GPIO pins for UART_TX and UART_RX.
+	//PA2=TX and PA3=RX
+
+	//First lets configure PA2 as UART2 TX
+
+	//2.1 Enable the clk for the GPIOA peripheral
+	pRCC->AHB1ENR |=(1 << 0);
+
+	//2.2 Change the mode to AF mode for the PA2.
+	pGPIOA->MODER &= ~(0x3 <<4);
+	pGPIOA->MODER |=  (0x2 << 4);
+
+	pGPIOA->AFR[0] &= ~(0xF << 8);
+	pGPIOA->AFR[0] |=  (0x7 << 8);
+	//2.3 Enable pull up or pull down resistor if required.
+	pGPIOA->PUPDR |= (0x1 << 4);
+
+	//Second lets configure PA3 as UART2 RX
+
+
+	//2.4 Change the mode to AF mode for the PA2.
+	pGPIOA->MODER &= ~(0x3 <<6);
+	pGPIOA->MODER |=  (0x2 << 6);
+
+	pGPIOA->AFR[0] &= ~(0xF << 12);
+	pGPIOA->AFR[0] |=  (0x7 << 12);
+	//2.5 Enable pull up or pull down resistor if required.
+	pGPIOA->PUPDR |= (0x1 << 6);
+
+	//3. Configure the baudrate.
+	pUART2->BRR = 0x8B;
+
+	//4. Configure the data width, no of stop bits, etc.
+	//<No configuration required we will use default values.>
+
+	//5. Enable the Tx engine of UART peripheral.
+	pUART2->CR1 |= (1 << 3);
+	//6. Enable the UART peripheral.
+	pUART2->CR1 |= (1 << 13);
+
+
+}
+void send_some_data(void){
+	char data[] = "Hi amma kutty\r\n";
+
+	USART_TypeDef *pUART2;
+	pUART2 = USART2;
+
+	//1. Make sure that the SR TXE is set. If TXE is 1, put the byte.
+	//We are waiting for TXE to become 1
+	for(uint32_t i=0; data[i]!='\0'; i++){
+	while(!(pUART2->SR & (1 << 7)));
+	pUART2->DR = data[i];
+	}
 
 }
 void dma1_init(void){

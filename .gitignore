@@ -1,5 +1,8 @@
-# Ignore Eclipse/STM32CubeIDE workspace settings
+# Eclipse / STM32CubeIDE workspace & project settings
 .metadata/
+.settings/
+.project
+.cproject
 
 # Build folders
 Debug/
