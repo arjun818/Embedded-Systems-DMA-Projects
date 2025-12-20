@@ -26,6 +26,8 @@ void send_some_data(void);
 
 #define BASE_ADDR_OF_GPIOA_PERI GPIOA
 
+char dataStream[] = "Hi Amma Kutty\r\n";
+
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
@@ -34,7 +36,7 @@ int main(void)
 {
 	button_init();
 	uart2_init();
-	send_some_data();
+//	send_some_data();
 	dma1_init();
     /* Loop forever */
 	for(;;);
@@ -148,5 +150,62 @@ void send_some_data(void){
 }
 void dma1_init(void){
 
+	RCC_TypeDef *pRCC;
+	pRCC = RCC;
+
+	DMA_TypeDef *pDMA;
+	pDMA = DMA1;
+
+	DMA_Stream_TypeDef *pStream6;
+	pStream6 = DMA1_Stream6;
+
+	USART_TypeDef *pUART2;
+	pUART2 = USART2;
+
+	//1. Enable the peripheral clk for DMA1.
+	pRCC->AHB1ENR |=(1<<21);
+
+	//2. Identify the stream which is suitable for your peripheral.
+	//Channel 4, stream 6
+
+	//3. Identify the channel number on which UART2 peripheral sends DMA request.
+	//Channel 4
+	pStream6->CR &= ~(0x7 << 25);
+	pStream6->CR |=  (0x4 << 25);
+
+	//4. Program the src address (Memory)
+	pStream6->M0AR = (uint32_t) dataStream;
+
+	//5. Program the dst address.(peripheral)
+	pStream6->PAR = (uint32_t) &pUART2->DR;
+
+	//6. Program the no. of data items to send.
+	uint32_t len = sizeof(dataStream);
+	pStream6->NDTR = len;
+
+	//7. The direction of data transfer. M2P, P2M, M2M.
+	pStream6->CR |= (0X1 << 6);
+
+	//8. Program the src and dst data width.
+	pStream6->CR &= ~(0x3 << 13);
+	pStream6->CR &= ~(0x3 << 11);
+	//8.1 Enable memory auto increment
+	pStream6->CR |= (1 << 10);
+
+	//9. Select Direct mode or FIFO mode.
+	pStream6->FCR |=(1 << 2);
+
+	//10. Select the FIFO threshold.
+	pStream6->FCR &= ~(0x3 << 0);//clearing
+	pStream6->FCR |=  (0x3 << 0);//setting
+
+	//11. Enable the circular mode if required.
+
+	//12. Single transfer or burst transfer.
+
+	//13. Configure the stream priority.
+
+	//14. Enable the stream.
+	pStream6->CR |= (1 << 0);
 }
 

@@ -17,6 +17,10 @@ void clear_exti_pending_bit(void){
 }
 
 void EXTI0_IRQHandler(void){
+	USART_TypeDef *pUART2;
+	pUART2 = USART2;
+	//Here we will send UART2_TX DMA request to DMA1 controller.
+	pUART2->CR3 |= (1 << 7);
+
 	clear_exti_pending_bit();
 }
-
